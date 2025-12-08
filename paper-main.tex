@@ -244,9 +244,17 @@ Intelligent robots capable of perceiving their surroundings, reasoning about tas
 \par In this work, we propose that competent LAM intelligence can be achieved by the composition of compute-efficient smaller models, where action verification is driven by symbolic logic. Specifically, this paper offers the following contributions:
 
 \begin{itemize}
-  \item \textbf{We describe a modular architecture that achieves LAM capabilities by augmenting LLMs with extant perception models.} By integrating pre-trained vision models (such as SAM and CLIP) to provide the LLM with grounded perception, we demonstrate a method to build competent action models without the need for additional training. This approach not only avoids the costs of end-to-end training but also renders the system's perceptual capabilities more extendable.
-  \item \textbf{We introduce a mechanism for control and explainability via PDDL generation.} We show that by treating the LLM as a "modeler" that generates Planning Domain Definition Language (PDDL) code, we can enforce symbolic verification on the robot's output, ensuring actions are logically sound before execution.
-  \item \textbf{We validate this hypothesis through a prototype engineering assistant.} We provide experimental evidence on a Universal Robots (UR) arm, demonstrating that this composite approach successfully grounds natural language commands into safe, interpretable physical actions.
+  \item \textbf{We propose a modular architecture that achieves LAM capabilities by augmenting LLMs with extant perception models.} By integrating pre-trained vision models (such as SAM and CLIP) to provide the LLM with grounded perception, we demonstrate a method to build competent action models without the need for additional training. This approach not only avoids the costs of end-to-end training but also make the system's perceptual capabilities more extendable.
+  
+  \item \textbf{We introduce and evaluate two distinct planning frameworks: a purely neural approach and a neuro-symbolic approach.}
+  \begin{itemize}
+      \item In the \textit{neuro-symbolic} approach, we mitigate the risk of invalid PDDL generation by restricting the LLM's role. We rely on the LLM only for dynamic state generation at runtime, while static elements (such as the robot's actions and capabilities) are hard-coded deterministically. This hybrid PDDL is then solved by a traditional solver to ensure plan correctness and reduce hallucinations.
+      \item In the \textit{neural} approach, we enforce safety by preventing the LLM from directly generating executable robot code. Instead, we utilize a hierarchical structure where a medium-level planner maps high-level subtasks to deterministic tools based on the robot's specific capabilities.
+  \end{itemize}
+
+  \item \textbf{We implement a human-in-the-loop verification stage for both planning workflows.} We demonstrate an interface where the generated plan is presented to the user for review and revision prior to execution, ensuring transparency and interpretability.
+
+  \item \textbf{We validate these hypotheses through a prototype engineering assistant.} We provide experimental evidence on a Universal Robots (UR) arm, demonstrating that this composite approach successfully grounds natural language commands into safe, interpretable physical actions.
 \end{itemize}
 
 \par The remainder of this paper is organized as follows: Section \ref{sec:arch}... \par\textcolor{red}{\textbf{describe structure here when everything else is done}}
@@ -272,7 +280,7 @@ The system's awareness is driven by two perception modules. The \textit{Percepti
 To bridge the gap between abstract natural language and precise robot motor control, we implement a three-tier planning hierarchy. This structure ensures that high-level reasoning is grounded in valid physical capabilities.
 
 \begin{itemize}
-    \item \textbf{High-Level Reasoning (The Cognitive Agent):} At the top of the hierarchy, the system interprets user commands by leveraging a Large Language Model (LLM), generating a structured sequence of subtasks or actions.
+    \item \textbf{High-Level Reasoning (The Cognitive Agent):} At the top of the hierarchy, the system interprets user commands using two distinct paradigms: a \textit{neural} approach, where an LLM directly generates action sequences for flexibility, and a \textit{neuro-symbolic} approach, where the LLM translates requests into formal problem definitions (e.g., PDDL) for verification by a symbolic solver.
     
     \item \textbf{Medium-Level Orchestration (The Translator):} This layer acts as an intermediary, treating the robot's capabilities as callable ``tools.'' It decomposes the high-level subtasks into specific action sequences if needed. This layer manages the flow of execution and facilitates dynamic feedback between the planner and the perception modules.
     
