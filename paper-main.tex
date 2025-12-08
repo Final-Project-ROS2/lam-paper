@@ -235,33 +235,21 @@ These results can support practitioners in the design and development of robotic
 
 \section{Introduction}
 
-\par\textcolor{red}{\textbf{Why Intelligent Robots matter}}
-\par\textcolor{red}{\textbf{Why it's difficult: challenges with classic tehniques on scalability and generalization, challenges with LLMs on control and explainability}}
-\par\textcolor{red}{\textbf{The promise of LAMs, and how they can be made neuro-symbolic}}
-
-\par Specifically, this paper offers the following contributions:
-
-\begin{itemize}
-  \item \textcolor{red}{\textbf{We describe an architecture that allows building competent LAMs without any additional training by leveraging extand smaller models in a hierarchical structure}}
-  \item ...
-\end{itemize}
-
-\par The remainder of this paper is organized as follows: Section \ref{sec:arch}... \par\textcolor{red}{\textbf{describe structure here when everything else is done}}
-\section{Introduction}
-
 Intelligent robots capable of perceiving their surroundings, reasoning about tasks, and executing reliable actions are increasingly essential in engineering, manufacturing, and everyday collaborative settings. Their potential impact lies not only in automating repetitive labor, but in enabling fluid human–robot collaboration where robots understand user intent, adapt to changing environments, and provide transparent, verifiable reasoning. Achieving this, however, requires solving the longstanding integration problem: connecting perception, language, symbolic reasoning, and physical control into a coherent system.
 
 \par Classic \textit{symbolic} AI approaches offer strong guarantees on correctness, interpretability, and verification, but scale poorly with the complexity and variability of real-world environments~\cite{tamp, recent-trends-in-tamp}. Conversely, \textit{neural} methods, particularly Large Language Models (LLMs) and Vision-Language Models (VLMs), excel at perception, abstraction, and generalization, but struggle with controllability, reliability, and the prevention of hallucinations~\cite{eval-application-challenges-llms}. These limitations hinder their deployment in safety-critical robotic systems, where incorrect reasoning can lead to dangerous actions~\cite{plangenllm}.
 
-\par Large Action Models (LAMs) have recently emerged as a transformative paradigm to address these gaps, marking a fundamental shift from passive language processing to active, real-world engagement~\cite{lam}.  Unlike traditional LLMs that are limited to text generation, LAMs are specifically designed to interpret abstract user intentions and generate executable action sequences in dynamic environments~\cite{lam}. However, this transition introduces significant challenges. As noted in recent studies, the ability to manipulate the physical world is a double-edged sword: unlike textual hallucinations, errors in action execution can lead to irreversible physical consequences or safety hazards~\cite{lam}. Furthermore, current LAMs often struggle with scalability and generalizability, typically requiring extensive data collection and retraining when applied to new environments~\cite{lam}. Consequently, a major open question is whether it is possible to construct practical, explainable, and safe LAMs without end-to-end training—using only existing small models and symbolic structures to ensure verification.
+\par Large Action Models (LAMs) have recently emerged as a potential solution to this integration gap. Defined as agents trained on large-scale offline datasets via causal sequence modeling, LAMs aim to extend the generalization capabilities of LLMs from text generation to active physical task completion~\cite{lram}. However, relying on massive end-to-end models presents distinct challenges. First, existing LAMs are primarily based on Transformer architectures, which suffer from quadratic inference complexity; this high latency is often prohibitive for real-time robotic control~\cite{lram}. Second, unlike textual hallucinations, errors in action execution ("action hallucinations") can lead to irreversible physical damage and safety hazards~\cite{lam}. Consequently, a major open question is whether it is possible to construct practical LAMs that are computationally efficient, safe, and explainable without the resource-intensive training of massive new sequence models.
 
 \par In this work, we propose that competent LAM intelligence can be achieved by the composition of compute-efficient smaller models, where action verification is driven by symbolic logic. Specifically, this paper offers the following contributions:
 
 \begin{itemize}
-  \item \textbf{We describe a neuro-symbolic architecture that constructs a LAM without additional training.} By leveraging extant models (such as SAM and CLIP) in a hierarchical structure, we demonstrate how to decouple perception from reasoning to achieve generalization in unstructured environments.
-  \item \textbf{We introduce a mechanism for control and explainability via PDDL generation.} We show that by treating the LLM as a "modeler" that generates Planning Domain Definition Language (PDDL) code, we can enforce symbolic verification on the robot's output, ensuring actions are logically sound before execution~\cite{code-as-symbolic-planner, llm-as-planning-formalizers}.
+  \item \textbf{We describe a modular architecture that achieves LAM capabilities by augmenting LLMs with extant perception models.} By integrating pre-trained vision models (such as SAM and CLIP) to provide the LLM with grounded perception, we demonstrate a method to build competent action models without the need for additional training. This approach not only avoids the costs of end-to-end training but also renders the system's perceptual capabilities more extendable.
+  \item \textbf{We introduce a mechanism for control and explainability via PDDL generation.} We show that by treating the LLM as a "modeler" that generates Planning Domain Definition Language (PDDL) code, we can enforce symbolic verification on the robot's output, ensuring actions are logically sound before execution.
   \item \textbf{We validate this hypothesis through a prototype engineering assistant.} We provide experimental evidence on a Universal Robots (UR) arm, demonstrating that this composite approach successfully grounds natural language commands into safe, interpretable physical actions.
 \end{itemize}
+
+\par The remainder of this paper is organized as follows: Section \ref{sec:arch}... \par\textcolor{red}{\textbf{describe structure here when everything else is done}}
 
 \section{Composing Large Action Model Architectures for Intelligent Robots}\label{sec:arch}
 
@@ -306,8 +294,6 @@ Intelligent robots capable of perceiving their surroundings, reasoning about tas
 \par\textcolor{red}{\textbf{Description of main results, and lessons learned}}
 \par\textcolor{red}{\textbf{Future work: what's missing? This isn't what you will do; this is what must be done, by anyone in the world, for this work to be better, given the lessons learned above}}
 
-
-\par dummy citation so BibTex doesn't complain: \cite{TeXFAQ}
 
 %%
 %% The acknowledgments section is defined using the "acks" environment
