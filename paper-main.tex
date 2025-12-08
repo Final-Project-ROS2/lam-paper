@@ -309,13 +309,42 @@ This intermediate symbolic layer is critical for debugging and verification. Bec
 
 \section{Case Study: a Human-in-the-Loop Intelligent Robotic Arm}
 
-\par\textcolor{red}{\textbf{Virtually identical to previous section, but now precisely describing your prototype. Here, all components are specified, challenges with specific technologies are described, etc. Here is where you show where, e.g., SAM goes in.}}
+To validate the feasibility of constructing transparent and competent Large Action Models (LAMs) from extant building blocks, we developed a prototype fully integrated within the Robot Operating System 2 (ROS2) framework. As illustrated in Figure~\ref{fig:planning-result-ros2-graph}, the architecture is defined by a modular, hierarchical planning pipeline where each functional component operates as an independent ROS2 Node.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{images/ros2_graph_updated.png}
+\caption{ROS2 Graph for the Overall System. The system integrates perception services, event-driven speech topics, and action-based planning nodes.}
+\label{fig:planning-result-ros2-graph}
+\Description{ROS2 Graph for the Overall System}{ROS2 Graph for the Overall System. The system integrates perception services, event-driven speech topics, and action-based planning nodes.}
+\end{figure}
+
+\textbf{Multi-modal Inputs.}
+The system's awareness is driven by two dedicated ROS2 nodes that interface with the planning core through distinct communication patterns. The \textit{Perception Node} encapsulates open-vocabulary foundation models to perform object segmentation and classification. This node operates several ROS2 services, providing on-demand semantic data to the planning module only when queried. Conversely, the \textit{Speech Node} utilizes a neural speech-to-text engine to capture user intent and publishes transcribed text via ROS2 topics. This event-driven approach allows for asynchronous commands and includes a high-priority channel for safety keywords, which can trigger immediate system halts.
+
+\textbf{Hierarchical Planning Core.}
+To bridge the gap between abstract natural language and precise robot motor control, the planning module is distributed across three distinct ROS2 nodes. Intra-module communication is primarily handled via ROS2 Actions, allowing for long-running processes with feedback mechanisms.
 
 \subsection{Perception Module}
 
 \subsection{Speech Module}
 
 \subsection{Planning Module}
+
+The implementation of the planning hierarchy relies on a synthesis of Large Language Model frameworks and standard robotics motion planning libraries.
+
+\textbf{High-Level Planner.}
+The reasoning agent is implemented using the LangChain framework~\cite{langchain-docs}, which manages the LLM context and tool usage. We explored two distinct implementations for this agent:
+\begin{enumerate}
+    \item \textbf{Neural Approach (LLM-Direct):} In this configuration, the LangChain agent is prompted to function as an end-to-end planner. It directly generates a structured sequence of subtasks based on the user's natural language instruction and the current perception context. 
+    \item \textbf{Neuro-Symbolic Approach (PDDL-based):} Here, the LangChain agent functions strictly as a semantic translator. Instead of generating the plan directly, it interprets the natural language instruction to generate a symbolic problem file in the Planning Domain Definition Language (PDDL)~\cite{pddl-1.2}. This problem file, combined with a static domain definition, is then solved by Fast Downward~\cite{the-fast-downward-planning-system}, a deterministic symbolic planner. This ensures that the resulting plan is mathematically verifiable and logically sound before it is passed down the hierarchy.
+\end{enumerate}
+
+\textbf{Medium-Level Planner.}
+The orchestration layer is also implemented as a LangChain agent. However, unlike the high-level planner, its role is deterministic execution management. It utilizes custom tools that act as wrappers around ROS2 service and action calls. This agent receives the subtasks (from either the direct LLM output or the Fast Downward solution) and translates them into specific API calls (e.g., triggering the \texttt{/plan\_cartesian\_relative} action), handling the immediate feedback loop with the robot's state.
+
+\textbf{Low-Level Planner.}
+The execution layer is handled by MoveIt2~\cite{moveit2}, which serves as the backend for path planning and trajectory generation. The \texttt{low\_level\_planner\_executor} node leverages MoveIt2's planning pipelines to solve for inverse kinematics and collision avoidance. It enforces Cartesian motion constraints and joint-space limits to ensure safe operation. By isolating the kinematic complexity within MoveIt2, the higher-level LangChain agents can focus entirely on task logic and semantic reasoning.
 
 \section{Experiments and Results}
 
