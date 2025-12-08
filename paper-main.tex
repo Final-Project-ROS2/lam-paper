@@ -255,7 +255,31 @@ Intelligent robots capable of perceiving their surroundings, reasoning about tas
 
 \subsection{LAM componentization}
 
-\par\textcolor{red}{\textbf{Overall description of your architecture, in the most general terms possible. E.g., no mention of SAM specifically: just a mention of any image-segmentation model. This is meant to describe your architecture so anyone else can build the same, using any other components. Describe the hierarchical planner, how it is used to implement a LAM. Images without specific details (e.g., Figure 2 in your report, and Figure 12, as it was in the presentation, without the ROS-specific details)}}
+We propose a modular, neuro-symbolic architecture that functions as a comprehensive Large Action Model (LAM). Rather than relying on a single, opaque neural network, our system is composed of specialized functional modules that integrate perception, reasoning, and action. As illustrated in Figure~\ref{fig:architecture_overview}, the architecture is defined by a hierarchical planning pipeline driven by multi-modal inputs.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/system_architecture.png}
+    \caption{System Architecture Overview. The framework connects high-level cognitive reasoning with deterministic motion control through a stratified planning hierarchy.}
+    \label{fig:architecture_overview}
+    \Description{System Architecture Overview}{System Architecture Overview. The framework connects high-level cognitive reasoning with deterministic motion control through a stratified planning hierarchy.}
+\end{figure}
+
+\textbf{Multi-modal Inputs.}
+The system's awareness is driven by two perception modules. The \textit{Perception Module} employs a variety of open-vocabulary foundation models to perform object segmentation, classification, and grasp synthesis. This converts raw pixel data into a useful information without requiring task-specific training. Simultaneously, the \textit{Speech Module} utilizes a neural speech-to-text engine to capture user intent. This interface includes a symbolic override mechanism, where specific safety keywords (e.g., ``Stop'') bypass the reasoning layers to trigger immediate hardware halts.
+
+\textbf{Hierarchical Planning Core.}
+To bridge the gap between abstract natural language and precise robot motor control, we implement a three-tier planning hierarchy. This structure ensures that high-level reasoning is grounded in valid physical capabilities.
+
+\begin{itemize}
+    \item \textbf{High-Level Reasoning (The Cognitive Agent):} At the top of the hierarchy, the system interprets user commands by leveraging a Large Language Model (LLM), generating a structured sequence of subtasks or actions.
+    
+    \item \textbf{Medium-Level Orchestration (The Translator):} This layer acts as an intermediary, treating the robot's capabilities as callable ``tools.'' It decomposes the high-level subtasks into specific action sequences if needed. This layer manages the flow of execution and facilitates dynamic feedback between the planner and the perception modules.
+    
+    \item \textbf{Low-Level Execution (The Controller):} The foundation of the hierarchy is the motion control core. It handles path planning, trajectory generation, and collision avoidance. This layer exposes interfaces for Cartesian and joint-space control, ensuring that the abstract plans received from above are executed with kinematic precision and adherence to safety constraints.
+\end{itemize}
+
+This stratified design allows the robot to benefit from the flexibility of modern Generative AI while maintaining the reliability and safety essential for physical interaction.
 
 \subsection{Symbolic Wrapping of LAMs}
 
