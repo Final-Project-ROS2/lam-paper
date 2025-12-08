@@ -283,8 +283,13 @@ This stratified design allows the robot to benefit from the flexibility of moder
 
 \subsection{Symbolic Wrapping of LAMs}
 
-\par\textcolor{red}{\textbf{Explain how the generation of PDDL (here, without necessarily mentioning PDDL specifically; just any symbolic, formal output) on the output stage allows you to verify, log, and debug any action}}
+To address the lack of interpretability and control in Large Action Models, we implement a "symbolic wrapping" strategy. This approach restricts the Large Language Model (LLM) from generating executable robot code directly. Instead, the model is constrained to produce intermediate symbolic representations, structured plans or formal logic definitions, which act as a verification layer before any physical motion occurs.
 
+In our neuro-symbolic pipeline, we reduce the risk of invalid symbolic outputs by decoupling the domain definition from the problem instance. The robot’s constraints and capabilities are hard-coded in a static symbolic framework, the robot's current state is deterministically determined, while the LLM generates the dynamic problem state at runtime. By feeding this symbolic representation into a deterministic solver, we ensure that the output is not just syntactically correct, but logically solvable. If the LLM "hallucinates" an impossible goal, the solver fails to find a plan, effectively trapping the error in the software layer rather than causing a physical failure.
+
+Similarly, in the neural-direct pipeline, we replace arbitrary code generation with structured tool usage. The LLM is restricted to selecting from a finite set of deterministic, pre-verified APIs. This limits the action space to safe operations and ensures that the model's intent is captured in a discrete list of sub-tasks.
+
+This intermediate symbolic layer is critical for debugging and verification. Because the output is a structured interpretable artifact (a plan or task list) rather than opaque neural weights or raw code, it allows for a "human-in-the-loop" review process where operators can confirm or revise the plan before actual execution. 
 
 \section{Case Study: a Human-in-the-Loop Intelligent Robotic Arm}
 
