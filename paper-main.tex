@@ -463,10 +463,14 @@ These structured approaches disentangle perception from reasoning, using neural 
 
 \section{Conclusions}
 
-\par\textcolor{red}{\textbf{Very short paragraph re-stating the contributions of your work; very similar to the "One sentence summarizing the main result" from the abstract}}
-\par\textcolor{red}{\textbf{Description of main results, and lessons learned}}
-\par\textcolor{red}{\textbf{Future work: what's missing? This isn't what you will do; this is what must be done, by anyone in the world, for this work to be better, given the lessons learned above}}
+\par
+This work demonstrates that the capabilities of Large Action Models (LAMs) can be effectively realized through a modular, neuro-symbolic architecture rather than relying exclusively on massive end-to-end training. We establish that by composing off-the-shelf perception models with a logic-driven core, it is possible to build intelligent robotic systems that remain interpretable and controllable. Specifically, we show that wrapping stochastic Large Language Models with deterministic symbolic constraints, whether through structured tool use or formal PDDL generation, bridges the gap between open-ended reasoning and the rigorous safety requirements of physical actuation.
 
+\par
+Our experiments verify that this composite approach successfully grounds natural language commands into safe physical actions while enabling critical human-in-the-loop intervention. We found that while a neural-direct approach offers greater flexibility for abstract instructions (achieving a 100\% success rate in our trials), the neuro-symbolic PDDL approach provides superior mathematical guarantees on plan validity, albeit with increased sensitivity to syntax generation errors. Crucially, the decoupling of high-level reasoning from low-level control allowed for a safety override latency of less than 1.5 seconds, proving that agentic intelligence can be deployed without compromising hardware safety protocols. The lesson learned is that the generation of an intermediate, human-readable symbolic plan is essential for preventing the "action hallucinations" common in black-box models.
+
+\par
+Despite these advancements, the reliability of generating formal symbolic structures remains a bottleneck. Future research must address the brittleness of neuro-symbolic translation, particularly by developing methods for the iterative self-correction of generated PDDL code to match the flexibility of direct neural approaches. Furthermore, for these systems to scale beyond structured settings, the field must move towards dynamic domain generation, where the robot can autonomously expand its symbolic understanding of the world based on novel perceptual inputs, rather than relying on static, hand-coded domain definitions.
 
 %%
 %% The acknowledgments section is defined using the "acks" environment
