@@ -275,7 +275,7 @@ Intelligent robots capable of perceiving their surroundings, reasoning about tas
   \item \textbf{We validate these hypotheses through a prototype engineering assistant.} We provide experimental evidence on a Universal Robots (UR) arm, demonstrating that this composite approach successfully grounds natural language commands into safe, interpretable physical actions.
 \end{itemize}
 
-\par The remainder of this paper is organized as follows: Section \ref{sec:arch}... \par\textcolor{red}{\textbf{describe structure here when everything else is done}}
+\par The remainder of this paper is organized as follows: Section \ref{sec:arch} delineates the proposed modular architecture and the ``symbolic wrapping'' methodology designed to enforce control over Large Action Models. Section \ref{sec:implementation} details the practical implementation of this framework within a ROS2-based robotic arm system. Section \ref{sec:experiments} presents our experimental validation, offering a comparative analysis between neural-direct and neuro-symbolic planning strategies regarding success rates and safety. Section \ref{sec:related-work} places our contribution in the context of related work on neural and hybrid planning. Finally, Section \ref{sec:conclusion} concludes the study and discusses future research directions.
 
 \section{Composing Large Action Model Architectures for Intelligent Robots}\label{sec:arch}
 
@@ -326,6 +326,7 @@ Similarly, in the neural-direct pipeline, we replace arbitrary code generation w
 This intermediate symbolic layer is critical for debugging and verification. Because the output is a structured interpretable artifact (a plan or task list) rather than opaque neural weights or raw code, it allows for a "human-in-the-loop" review process where operators can confirm or revise the plan before actual execution.
 
 \section{Case Study: a Human-in-the-Loop Intelligent Robotic Arm}
+\label{sec:implementation}
 
 To validate the feasibility of constructing transparent and competent Large Action Models (LAMs) from extant building blocks, we developed a prototype fully integrated within the Robot Operating System 2 (ROS2) framework. As illustrated in Figure~\ref{fig:planning-result-ros2-graph}, the architecture is defined by a modular, hierarchical planning pipeline where each functional component operates as an independent ROS2 Node.
 
@@ -365,6 +366,7 @@ The orchestration layer is also implemented as a LangChain agent. However, unlik
 The execution layer is handled by MoveIt2~\cite{moveit2}, which serves as the backend for path planning and trajectory generation. The \texttt{low\_level\_planner\_executor} node leverages MoveIt2's planning pipelines to solve for inverse kinematics and collision avoidance. It enforces Cartesian motion constraints and joint-space limits to ensure safe operation. By isolating the kinematic complexity within MoveIt2, the higher-level LangChain agents can focus entirely on task logic and semantic reasoning.
 
 \section{Experiments and Results}
+\label{sec:experiments}
 
 To validate the hypothesis that competent Large Action Models (LAMs) can be constructed using a composition of third-party smaller components and symbolic wrappers, we conducted a series of experiments evaluating the system's modularity, planning capabilities, and safety response. The experimental framework was established across two environments, simulation and physical hardware, to ensure both scalability and physical applicability.
 
@@ -444,6 +446,7 @@ The \textbf{LLM-Direct} approach achieved a 100\% success rate, utilizing its "t
 \textbf{Safety and Responsiveness:} A critical requirement for LAMs operating in human-centric spaces is the ability to override AI autonomy with deterministic safety layers. We measured the system's latency in processing an ``Emergency Stop'' voice command during active motion. The system achieved an average stop latency of $1.41 \pm 0.14$ seconds. This confirms that the hierarchical architecture successfully decouples high-level AI planning from low-level safety protocols, ensuring that human intervention remains preemptive regardless of the complexity of the current AI task.
 
 \section{Related Work}
+\label{sec:related-work}
 
 The realization of intelligent robotic agents requires bridging the gap between high-level semantic understanding and low-level physical actuation. The literature describes a progression from purely symbolic planners to data-driven neural networks, and more recently, towards integrated Large Action Models (LAMs) and hybrid architectures.
 
@@ -462,6 +465,7 @@ To ensure control and reliability, newer approaches are moving away from purely 
 These structured approaches disentangle perception from reasoning, using neural networks for visual grounding and symbolic or structured engines for planning~\cite{nsai, enhancing-interpret}. By verifying neural outputs against constraints, such as those defined in PDDL, these hybrid frameworks mitigate the "black box" problem, offering a pathway to robust, interpretable, and verifiable Large Action Models~\cite{audere}.
 
 \section{Conclusions}
+\label{sec:conclusion}
 
 \par
 This work demonstrates that the capabilities of Large Action Models (LAMs) can be effectively realized through a modular, neuro-symbolic architecture rather than relying exclusively on massive end-to-end training. We establish that by composing off-the-shelf perception models with a logic-driven core, it is possible to build intelligent robotic systems that remain interpretable and controllable. Specifically, we show that wrapping stochastic Large Language Models with deterministic symbolic constraints, whether through structured tool use or formal PDDL generation, bridges the gap between open-ended reasoning and the rigorous safety requirements of physical actuation.
