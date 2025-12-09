@@ -348,7 +348,41 @@ The execution layer is handled by MoveIt2~\cite{moveit2}, which serves as the ba
 
 \section{Experiments and Results}
 
-\par\textcolor{red}{\textbf{Description of all experiments you made, and associated results. Tables and plots. Images of simulation and reality, with links to the associated videos.}}
+To validate the hypothesis that competent Large Action Models (LAMs) can be constructed using a composition of third-party smaller components and symbolic wrappers, we conducted a series of experiments evaluating the system's modularity, planning capabilities, and safety response. The experimental framework was established across two environments, simulation and physical hardware, to ensure both scalability and physical applicability.
+
+\subsection{System Validation and Environment}
+
+The architecture was first deployed in a simulation using \textbf{Gazebo Classic}~\cite{gazebo}, modeling a UR5 robotic arm with a Robotiq 2F-85 gripper and depth perception (Figure~\ref{fig:simulation-gazebo-setup}). This environment validated the ROS2 integration graph and the perception-action loop prior to physical deployment.
+
+Subsequently, the system was transferred to real hardware using a \textbf{UR3e robot} with a Robotiq HandE gripper. By leveraging the official UR ROS2 Driver~\cite{ur_ros2_driver} and unified ROS2 interfaces, the transition from simulation to reality required no architectural changes, confirming the portability of the component-based design (Figure~\ref{fig:hardware-result-sim-vs-real}).
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/gazebo_setup.png}
+    \caption{Simulation environment in Gazebo utilizing standard ROS2 interfaces for component validation.}
+    \Description{Simulation environment in Gazebo}{Simulation environment in Gazebo utilizing standard ROS2 interfaces for component validation.}
+    \label{fig:simulation-gazebo-setup}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/sim_vs_real.png}
+    \caption{Comparison between Simulation (Gazebo) and Real Hardware Setup (UR3e with Robotiq HandE gripper).}
+    \Description{Comparison between Simulation and Real Hardware}{Comparison between Simulation (Gazebo) and Real Hardware Setup (UR3e with Robotiq HandE gripper).}
+    \label{fig:hardware-result-sim-vs-real}
+\end{figure}
+
+Qualitative performance was established through a series of demonstrations illustrating the system's ability to interpret natural language, revise plans dynamically, and execute safety protocols:
+\begin{itemize}
+    \item \textbf{Full System Integration:} A demonstration of the complete pipeline (ASR, Planning, Perception) in Gazebo. The robot executes motion commands based on specific objects detected in the scene by the vision module. \\
+    \href{https://drive.google.com/file/d/1draHgIV_FaXqrEH4p6pD_vMLNN0HLVL3/view?usp=sharing}{[Video Demonstration]}
+    
+    \item \textbf{Sim-to-Real Consistency:} A side-by-side comparison of the ASR and planning modules driving both the simulated robot and the physical UR3e simultaneously, highlighting the architectural uniformity. \\
+    \href{https://drive.google.com/file/d/1yYsGxQITKcc62LWY9pjuGWzi5-gLacgh/view?usp=sharing}{[Video Demonstration]}
+    
+    \item \textbf{Dynamic Plan Revision:} A demonstration of the system's interpretability and memory. The user interrupts an initially generated plan with a natural language correction (``Swap the action order''), and the system correctly regenerates the task sequence before execution. \\
+    \href{https://drive.google.com/file/d/1QjeXoCuzd0tnjiekhAuwajCcLh3JXEpf/view?usp=sharing}{[Video Demonstration]}
+\end{itemize}
 
 \subsection{Perception Module}
 
@@ -356,6 +390,40 @@ The execution layer is handled by MoveIt2~\cite{moveit2}, which serves as the ba
 
 \subsection{Planning Module}
 
+The core hypothesis of this work suggests that competent Large Action Models should not rely on end-to-end generation of low-level control code, but rather on the composition of high-level reasoning with symbolic constraints. We evaluated two implementations of this philosophy:
+\begin{enumerate}
+    \item \textbf{LLM-Direct (Tool-Use):} The model maps instructions to a structured sequence of subtasks or actions which are then executed using a restricted set of pre-defined API "tools" (e.g., \texttt{move\_to}, \texttt{grip}), effectively wrapping neural outputs in a functional symbolic layer.
+    \item \textbf{Neuro-Symbolic (PDDL):} The model translates instructions into a formal PDDL problem definition, which is solved deterministically by the Fast Downward planner.
+\end{enumerate}
+
+\textbf{Control and Interpretability:}
+Crucially, both methods differ from "black-box" end-to-end models by enforcing a verification layer. Whether generating a sequence of tool calls or a PDDL problem instance, the system produces an intermediate, human-readable plan. This allows for the \textit{Plan Revision} behavior demonstrated in our experiments, where high-level plans can be inspected and modified by the user prior to any physical execution. This architecture ensures that the stochasticity of the LLM is confined to the reasoning phase, while the execution phase remains transparent and bounded by the robot's defined capabilities.
+
+\textbf{Comparative Performance:}
+We evaluated both approaches on a set of 13 tasks ($N=65$ total trials). The results (Table~\ref{tab:planning-eval}) indicate that while both methods successfully leverage symbolic grounding to control output, they trade off between flexibility and strictness.
+
+The \textbf{LLM-Direct} approach achieved a 100\% success rate, utilizing its "tool-calling" capability to flexibly handle abstract instructions that are difficult to model in strict PDDL. The \textbf{Neuro-Symbolic} approach (91\% success) was slightly faster ($6.83$s vs $7.20$s) and provided rigorous mathematical guarantees on plan validity; however, it was more brittle when the LLM failed to generate syntactically perfect PDDL.
+
+\begin{table}[h!]
+    \centering
+    \caption{Performance Comparison of Neural (LLM-Direct) and Neuro-Symbolic (PDDL-Based) Planning}
+    \label{tab:planning-eval}
+    \begin{tabular}{lcc}
+    \hline
+    \textbf{Metric} & \textbf{LLM-Direct} & \textbf{Neuro-Symbolic (PDDL)} \\
+    \hline
+    Avg. Execution Time per Step (s) & $7.20 \pm 0.25$ & $\mathbf{6.83 \pm 0.27}$ \\
+    Success Rate (\%) & $\mathbf{100.0}$ & $91.0$ \\
+    LLM Requests per Step & $2.0$ & $2.0$ \\
+    Computational Cost (Tokens) & $\approx 3{,}000$ & $\approx 3{,}000$ \\
+    \hline
+    \end{tabular}
+    \begin{flushleft}
+    \footnotesize{Note: Time difference is statistically significant ($p = 0.049$).}
+    \end{flushleft}
+\end{table}
+
+\textbf{Safety and Responsiveness:} A critical requirement for LAMs operating in human-centric spaces is the ability to override AI autonomy with deterministic safety layers. We measured the system's latency in processing an ``Emergency Stop'' voice command during active motion. The system achieved an average stop latency of $1.41 \pm 0.14$ seconds. This confirms that the hierarchical architecture successfully decouples high-level AI planning from low-level safety protocols, ensuring that human intervention remains preemptive regardless of the complexity of the current AI task.
 
 \section{Related Work}
 \par\textcolor{red}{\textbf{Description of classic techniques (symbolic only), focusing on PDDL}}
