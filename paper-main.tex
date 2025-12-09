@@ -170,12 +170,19 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
+%One or two sentences providing a basic introduction to the field,
+%comprehensible to a scientist in any discipline.
 The realization of intelligent robots, operating autonomously and interacting with other intelligent agents, human or artificial, requires the integration of environment perception, reasoning, and action.
-Classic Artificial Intelligence techniques for this purpose, focusing on \textit{symbolic} approaches, have long-ago hit the scalability wall on compute and memory costs. Advances in Large Language Models in the past decade (\textit{neural} approaches) have resulted in unprecedented displays of capability, at the cost of control, explainability, and interpretability. 
-Large Action Models aim at extending Large Language Models to encompass the full perception, reasoning, and action cycle; requiring substantially more comprehensive training and suffering from the same deficiencies.
-Here, we show it is possible to build competent Large Action Models using extant building-blocks, and that their control, interpretability, and explainability can be effected by incorporating symbolic wrappers, and associated verification, on their outputs, achieving \textit{neuro-symbolic} solutions for intelligent robots.
-Our experiments on a multi-modal robot show a Large Action Model intelligence can be achieved by the composition of compute-efficient smaller models, where action verification and explainability is driven by the generation and verification of Planning Domain Definition Language code.
-These results can support practitioners in the design and development of robotic Large Action Models across novel industries, and shed some light on the the ongoing challenges that must be addressed in the field.
+%Two to three sentences of more detailed background, comprehensible %to scientists in related disciplines.
+Classic Artificial Intelligence techniques for this purpose, focusing on \textit{symbolic} approaches, have long-ago hit the scalability wall on compute and memory costs. Advances in Large Language Models in the past decade (\textit{neural} approaches) have resulted in unprecedented displays of capability, at the cost of control, explainability, and interpretability.
+%One sentence clearly stating the general problem being addressed by this particular study.
+Large Action Models aim at extending Large Language Models to encompass the full perception, reasoning, and action cycle; however, they typically require substantially more comprehensive training and suffer from the same deficiencies in reliability.
+%One sentence summarizing the main result (with the words “here we show” or their equivalent).
+Here, we show it is possible to build competent Large Action Models by composing off-the-shelf foundation models, and that their control, interpretability, and explainability can be effected by incorporating symbolic wrappers and associated verification on their outputs, achieving verifiable \textit{neuro-symbolic} solutions for intelligent robots.
+%Two or three sentences explaining what the main result reveals in direct comparison to what was thought to be the case previously, or how the main result adds to previous knowledge
+Our experiments on a multi-modal robot demonstrate that Large Action Model intelligence does not require massive end-to-end training, but can be achieved by integrating efficient perception models with a logic-driven core. We find that driving action execution through the generation of Planning Domain Definition Language (PDDL) code enables a human-in-the-loop verification stage that effectively mitigates action hallucinations.
+%One or two sentences to put the results into a more general context
+These results can support practitioners in the design and development of robotic Large Action Models across novel industries, and shed light on the ongoing challenges that must be addressed to ensure safety in the field.
 
 
 %Two or three sentences to provide a broader perspective, readily
@@ -190,39 +197,50 @@ These results can support practitioners in the design and development of robotic
 %%
 \begin{CCSXML}
 <ccs2012>
- <concept>
-  <concept_id>00000000.0000000.0000000</concept_id>
-  <concept_desc>Do Not Use This Code, Generate the Correct Terms for Your Paper</concept_desc>
-  <concept_significance>500</concept_significance>
- </concept>
- <concept>
-  <concept_id>00000000.00000000.00000000</concept_id>
-  <concept_desc>Do Not Use This Code, Generate the Correct Terms for Your Paper</concept_desc>
-  <concept_significance>300</concept_significance>
- </concept>
- <concept>
-  <concept_id>00000000.00000000.00000000</concept_id>
-  <concept_desc>Do Not Use This Code, Generate the Correct Terms for Your Paper</concept_desc>
-  <concept_significance>100</concept_significance>
- </concept>
- <concept>
-  <concept_id>00000000.00000000.00000000</concept_id>
-  <concept_desc>Do Not Use This Code, Generate the Correct Terms for Your Paper</concept_desc>
-  <concept_significance>100</concept_significance>
- </concept>
-</ccs2012>
+   <concept>
+       <concept_id>10010147.10010178.10010199.10010200</concept_id>
+       <concept_desc>Computing methodologies~Planning for deterministic actions</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10010147.10010178.10010199.10010204</concept_id>
+       <concept_desc>Computing methodologies~Robotic planning</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10010520.10010553.10010554</concept_id>
+       <concept_desc>Computer systems organization~Robotics</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10010147.10010178.10010187</concept_id>
+       <concept_desc>Computing methodologies~Knowledge representation and reasoning</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10003120.10003121</concept_id>
+       <concept_desc>Human-centered computing~Human computer interaction (HCI)</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10010147.10010257.10010293.10010294</concept_id>
+       <concept_desc>Computing methodologies~Neural networks</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+ </ccs2012>
 \end{CCSXML}
 
-\ccsdesc[500]{Do Not Use This Code~Generate the Correct Terms for Your Paper}
-\ccsdesc[300]{Do Not Use This Code~Generate the Correct Terms for Your Paper}
-\ccsdesc{Do Not Use This Code~Generate the Correct Terms for Your Paper}
-\ccsdesc[100]{Do Not Use This Code~Generate the Correct Terms for Your Paper}
+\ccsdesc[500]{Computing methodologies~Planning for deterministic actions}
+\ccsdesc[500]{Computing methodologies~Robotic planning}
+\ccsdesc[500]{Computer systems organization~Robotics}
+\ccsdesc[300]{Computing methodologies~Knowledge representation and reasoning}
+\ccsdesc[300]{Human-centered computing~Human computer interaction (HCI)}
+\ccsdesc[300]{Computing methodologies~Neural networks}
 
 %%
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
-\keywords{Do, Not, Use, This, Code, Put, the, Correct, Terms, for,
-  Your, Paper}
+\keywords{Large Action Models, Neuro-symbolic AI, Human-in-the-loop, Agentic AI, Task and Motion Planning, PDDL, Langchain, ROS2}
 
 \received{20 February 2007}
 \received[revised]{12 March 2009}
