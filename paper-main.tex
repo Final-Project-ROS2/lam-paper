@@ -127,12 +127,12 @@
 \email{6538020621@student.chula.ac.th}
 
 \author{Methasit Boonpun}
-\orcid{0009-0000-5772-1325}
+\orcid{0009-0006-5736-1036}
 \affiliation{%
   \institution{International School of Engineering, Faculty of Engineering, Chulalongkorn University}
   \city{Bangkok}
   \country{Thailand}}
-\email{methasit.b@chula.ac.th}
+\email{6538165021@student.chula.ac.th}
 
 \author{Withawin Kraipetchara}
 \orcid{0009-0003-9832-0386}
@@ -141,14 +141,6 @@
   \city{Bangkok}
   \country{Thailand}}
 \email{6538191221@student.chula.ac.th}
-
-\author{Krittin Kitjaruwannakul}
-\orcid{0009-0000-5772-1325}
-\affiliation{%
-  \institution{International School of Engineering, Faculty of Engineering, Chulalongkorn University}
-  \city{Bangkok}
-  \country{Thailand}}
-\email{krittin.k@chula.ac.th}
 
 \author{Paulo Garcia}
 \orcid{0000-0002-1041-5205}
@@ -283,7 +275,7 @@ Intelligent robots capable of perceiving their surroundings, reasoning about tas
 
 We propose a modular, neuro-symbolic architecture that functions as a comprehensive Large Action Model (LAM). Rather than relying on a single, opaque neural network, our system is composed of specialized functional modules that integrate perception, reasoning, and action. As illustrated in Figure~\ref{fig:architecture_overview}, the architecture is defined by a hierarchical planning pipeline driven by multi-modal inputs.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=\linewidth]{images/system_architecture.png}
     \caption{System Architecture Overview. The framework connects high-level cognitive reasoning with deterministic motion control through a stratified planning hierarchy.}
@@ -311,7 +303,7 @@ This stratified design allows the robot to benefit from the flexibility of moder
 
 To address the lack of interpretability and control in Large Action Models, we implement a "symbolic wrapping" strategy. This approach restricts the Large Language Model (LLM) from generating executable robot code directly. Instead, the model is constrained to produce intermediate symbolic representations, structured plans or formal logic definitions, which act as a verification layer before any physical motion occurs. An overview of this architecture, illustrating the workflows for both pipelines, is depicted in Figure~\ref{fig:symbolic_wrapping}.
 
-\begin{figure}[tb]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=\linewidth]{images/symbolic_wrapping_diagram.png}
     \caption{Overview of Symbolic Wrapping Architecture.}
@@ -330,7 +322,7 @@ This intermediate symbolic layer is critical for debugging and verification. Bec
 
 To validate the feasibility of constructing transparent and competent Large Action Models (LAMs) from extant building blocks, we developed a prototype fully integrated within the Robot Operating System 2 (ROS2) framework. As illustrated in Figure~\ref{fig:planning-result-ros2-graph}, the architecture is defined by a modular, hierarchical planning pipeline where each functional component operates as an independent ROS2 Node.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{images/ros2_graph_updated.png}
 \caption{ROS2 Graph for the Overall System. The system integrates perception services, event-driven speech topics, and action-based planning nodes.}
@@ -345,6 +337,39 @@ The system's awareness is driven by two dedicated ROS2 nodes that interface with
 To bridge the gap between abstract natural language and precise robot motor control, the planning module is distributed across three distinct ROS2 nodes. Intra-module communication is primarily handled via ROS2 Actions, allowing for long-running processes with feedback mechanisms.
 
 \subsection{Perception Module}
+Functioning as the sensory cortex of the system, the Perception Module bridges the gap between raw optical data and the \textit{Hierarchical Planning Core}. While the high-level planner requires semantic labels (e.g., ``red cube'') to reason about task logic, the low-level executor requires precise geometric affordances (e.g., 6-DoF poses) for actuation. Consequently, the perception architecture is designed to effectuate simultaneous geometric estimation and semantic reasoning through a service-oriented approach.
+
+\subsubsection{Architecture and ROS2 Integration}
+
+To ensure modularity and asynchronous operation, the vision pipeline was refactored from standalone scripts into a fully distributed \textbf{ROS2} architecture~\cite{macenski2022robot}. Utilizing \texttt{rclpy} for node orchestration and \texttt{cv\_bridge} for efficient image transport, the system decouples heavy inference tasks from the control loop. This design allows specific perception capabilities—segmentation, classification, grasping, or scene reasoning—to be invoked strictly on-demand by the Medium or High-Level Planners, minimizing computational overhead during idle states.
+
+The perception stack comprises five specialized nodes, categorized by their contribution to the planning hierarchy:
+
+\begin{enumerate}
+    \item \textbf{Geometric Perception (Action-Centric):}
+    \begin{itemize}
+        \item \textit{SAM Detector} (\texttt{simple\_sam\_detector}): Leverages the \\Segment Anything Model (SAM)~\cite{kirillov2023segment} to generate instance masks and bounding boxes from raw RGB inputs.
+        \item \textit{GraspNet Detector} (\texttt{graspnet\_detector}): Computes 6-DoF grasp configurations for detected instances using the GraspNet-1Billion baseline~\cite{fang2020graspnet}, publishing quality scores ($Q$) and approach vectors essential for the Low-Level Executor.
+        \item \textit{Pixel-to-Real Service} (\texttt{pixel\_to\_real}): A utility node that continuously subscribes to depth streams, converting 2D pixel coordinates $(u, v)$ into 3D world coordinates $(x, y, z)$ via the camera's intrinsic matrix.
+    \end{itemize}
+    
+    \item \textbf{Semantic Perception (Reasoning-Centric):}
+    \begin{itemize}
+        \item \textit{CLIP Classifier} (\texttt{clip\_classifier}): Performs zero-shot semantic classification on SAM-generated regions using the CLIP architecture~\cite{radford2021learning}. This provides the High-Level Planner with open-vocabulary object identification capabilities.
+        \item \textit{Scene Understanding} (\texttt{scene\_understanding}): Derives a relational graph (e.g., adjacency, support, containment) from spatial data, allowing the planner to query environmental context (e.g., ``is object A to the left of object B or behind it?'').
+    \end{itemize}
+\end{enumerate}
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{images/perception_pipeline.png}
+\caption{The modular ROS2 perception architecture. Raw RGB-D data is processed into structured semantic and geometric messages, accessible to the planner via specific service calls.}
+\Description{The modular ROS2 perception architecture}{The modular ROS2 perception architecture. Raw RGB-D data is processed into structured semantic and geometric messages, accessible to the planner via specific service calls.}
+\label{fig:perception_pipeline}
+\end{figure}
+
+
 
 \subsection{Speech Module}
 
@@ -390,7 +415,7 @@ The architecture was first deployed in a simulation using \textbf{Gazebo Classic
 
 Subsequently, the system was transferred to real hardware using a \textbf{UR3e robot} with a Robotiq HandE gripper. By leveraging the official UR ROS2 Driver~\cite{ur_ros2_driver} and unified ROS2 interfaces, the transition from simulation to reality required no architectural changes, confirming the portability of the component-based design (Figure~\ref{fig:hardware-result-sim-vs-real}).
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\linewidth]{images/gazebo_setup.png}
     \caption{Simulation environment in Gazebo utilizing standard ROS2 interfaces for component validation.}
@@ -398,7 +423,7 @@ Subsequently, the system was transferred to real hardware using a \textbf{UR3e r
     \label{fig:simulation-gazebo-setup}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\linewidth]{images/sim_vs_real.png}
     \caption{Comparison between Real Hardware Setup (UR3e with Robotiq HandE gripper) and Simulation (Gazebo).}
@@ -419,6 +444,43 @@ Qualitative performance was established through a series of demonstrations illus
 \end{itemize}
 
 \subsection{Perception Module}
+
+The vision pipeline was rigorously evaluated in a high-fidelity Gazebo simulation environment to establish baseline performance metrics prior to physical deployment.
+
+The evaluation dataset consisted of 5 distinct world configurations, each populated with 5 randomized objects, totaling 25 unique object instances. The testing protocol involved an end-to-end execution where the \texttt{/vision/run\_pipeline} service was triggered for each scene. We logged outputs from all sub-modules and compared them against ground-truth simulation states.
+
+Performance was quantified using standard computer vision metrics adapted for robotic tasks:
+\begin{itemize}
+    \item \textbf{Segmentation:} Average Precision (AP) at Intersection-over-Union (IoU) $\ge 0.5$.
+    \item \textbf{Classification:} Top-1 Accuracy, measuring the fraction of proposals where the highest-scoring CLIP label matched the ground truth.
+    \item \textbf{Grasp Quality:} Mean Quality Score ($Q$), a consolidated metric of grasp feasibility (antipodal geometry and collision clearance).
+    \item \textbf{Spatial Accuracy:} The success rate of the scene understanding module in correctly identifying relative spatial predicates (e.g., \texttt{left-of}, \texttt{on-top-of}) and metric positions within a 2cm tolerance.
+    \item \textbf{Metric Projection:} Root Mean Square Error (RMSE) of the pixel-to-real coordinate conversion.
+\end{itemize}
+
+\textbf{Results.}
+Table~\ref{tab:vision-eval} summarizes the aggregate performance across all trials. The system demonstrated high geometric fidelity, with the Pixel-to-Real service achieving an RMSE of $0.054$m, well within the capture tolerance of standard parallel-jaw grippers. The Scene Understanding module achieved a $0.98$ success rate, validating the High-Level Planner's ability to construct reliable mental models of the environment.
+
+\begin{table}[htbp]
+\centering
+\caption{Aggregate perception module benchmark results ($N=25$ Objects).}
+\label{tab:vision-eval}
+\begin{tabular}{lcc}
+\hline
+\textbf{Module} & \textbf{Metric} & \textbf{Result} \\
+\hline
+SAM (Segmentation) & AP (IoU $\ge$ 0.5) & $0.741$ \\
+CLIP (Classification) & Top-1 Accuracy & $0.850$ \\
+GraspNet (Pose Estimation) & Mean Quality Score ($Q$) & $0.746$ \\
+Scene Understanding & Spatial Accuracy & $0.980$ \\
+Pixel-to-Real Service & RMSE (meters) & $0.054$ \\
+\hline
+\end{tabular}
+\end{table}
+
+While GraspNet achieved a respectable mean quality score of $0.746$, failures were primarily observed in scenarios with heavy occlusion or extreme object overlap. However, the high classification accuracy ($85\%$) suggests that the semantic layer is sufficiently robust to support natural language grounding in the subsequent planning phases.
+
+
 
 \subsection{Speech Module}
 
