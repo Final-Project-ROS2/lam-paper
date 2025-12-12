@@ -142,14 +142,6 @@
   \country{Thailand}}
 \email{6538191221@student.chula.ac.th}
 
-\author{Krittin Kitjaruwannakul}
-\orcid{0009-0000-5772-1325}
-\affiliation{%
-  \institution{International School of Engineering, Faculty of Engineering, Chulalongkorn University}
-  \city{Bangkok}
-  \country{Thailand}}
-\email{krittin.k@chula.ac.th}
-
 \author{Paulo Garcia}
 \orcid{0000-0002-1041-5205}
 \affiliation{%
@@ -283,7 +275,7 @@ Intelligent robots capable of perceiving their surroundings, reasoning about tas
 
 We propose a modular, neuro-symbolic architecture that functions as a comprehensive Large Action Model (LAM). Rather than relying on a single, opaque neural network, our system is composed of specialized functional modules that integrate perception, reasoning, and action. As illustrated in Figure~\ref{fig:architecture_overview}, the architecture is defined by a hierarchical planning pipeline driven by multi-modal inputs.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=\linewidth]{images/system_architecture.png}
     \caption{System Architecture Overview. The framework connects high-level cognitive reasoning with deterministic motion control through a stratified planning hierarchy.}
@@ -311,7 +303,7 @@ This stratified design allows the robot to benefit from the flexibility of moder
 
 To address the lack of interpretability and control in Large Action Models, we implement a "symbolic wrapping" strategy. This approach restricts the Large Language Model (LLM) from generating executable robot code directly. Instead, the model is constrained to produce intermediate symbolic representations, structured plans or formal logic definitions, which act as a verification layer before any physical motion occurs. An overview of this architecture, illustrating the workflows for both pipelines, is depicted in Figure~\ref{fig:symbolic_wrapping}.
 
-\begin{figure}[tb]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=\linewidth]{images/symbolic_wrapping_diagram.png}
     \caption{Overview of Symbolic Wrapping Architecture.}
@@ -330,7 +322,7 @@ This intermediate symbolic layer is critical for debugging and verification. Bec
 
 To validate the feasibility of constructing transparent and competent Large Action Models (LAMs) from extant building blocks, we developed a prototype fully integrated within the Robot Operating System 2 (ROS2) framework. As illustrated in Figure~\ref{fig:planning-result-ros2-graph}, the architecture is defined by a modular, hierarchical planning pipeline where each functional component operates as an independent ROS2 Node.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{images/ros2_graph_updated.png}
 \caption{ROS2 Graph for the Overall System. The system integrates perception services, event-driven speech topics, and action-based planning nodes.}
@@ -356,15 +348,15 @@ The perception stack comprises five specialized nodes, categorized by their cont
 \begin{enumerate}
     \item \textbf{Geometric Perception (Action-Centric):}
     \begin{itemize}
-        \item \textit{SAM Detector (\texttt{simple\_sam\_detector}):} Leverages the Segment Anything Model (SAM)~\cite{kirillov2023segment} to generate instance masks and bounding boxes from raw RGB inputs.
-        \item \textit{GraspNet Detector (\texttt{graspnet\_detector}):} Computes 6-DoF grasp configurations for detected instances using the GraspNet-1Billion baseline~\cite{fang2020graspnet}, publishing quality scores ($Q$) and approach vectors essential for the Low-Level Executor.
-        \item \textit{Pixel-to-Real Service (\texttt{pixel\_to\_real}):} A utility node that continuously subscribes to depth streams, converting 2D pixel coordinates $(u, v)$ into 3D world coordinates $(x, y, z)$ via the camera's intrinsic matrix.
+        \item \textit{SAM Detector} (\texttt{simple\_sam\_detector}): Leverages the \\Segment Anything Model (SAM)~\cite{kirillov2023segment} to generate instance masks and bounding boxes from raw RGB inputs.
+        \item \textit{GraspNet Detector} (\texttt{graspnet\_detector}): Computes 6-DoF grasp configurations for detected instances using the GraspNet-1Billion baseline~\cite{fang2020graspnet}, publishing quality scores ($Q$) and approach vectors essential for the Low-Level Executor.
+        \item \textit{Pixel-to-Real Service} (\texttt{pixel\_to\_real}): A utility node that continuously subscribes to depth streams, converting 2D pixel coordinates $(u, v)$ into 3D world coordinates $(x, y, z)$ via the camera's intrinsic matrix.
     \end{itemize}
     
     \item \textbf{Semantic Perception (Reasoning-Centric):}
     \begin{itemize}
-        \item \textit{CLIP Classifier (\texttt{clip\_classifier}):} Performs zero-shot semantic classification on SAM-generated regions using the CLIP architecture~\cite{radford2021learning}. This provides the High-Level Planner with open-vocabulary object identification capabilities.
-        \item \textit{Scene Understanding (\texttt{scene\_understanding}):} Derives a relational graph (e.g., adjacency, support, containment) from spatial data, allowing the planner to query environmental context (e.g., ``is object A to the left of object B or behind it?'').
+        \item \textit{CLIP Classifier} (\texttt{clip\_classifier}): Performs zero-shot semantic classification on SAM-generated regions using the CLIP architecture~\cite{radford2021learning}. This provides the High-Level Planner with open-vocabulary object identification capabilities.
+        \item \textit{Scene Understanding} (\texttt{scene\_understanding}): Derives a relational graph (e.g., adjacency, support, containment) from spatial data, allowing the planner to query environmental context (e.g., ``is object A to the left of object B or behind it?'').
     \end{itemize}
 \end{enumerate}
 
@@ -373,6 +365,7 @@ The perception stack comprises five specialized nodes, categorized by their cont
 \centering
 \includegraphics[width=\linewidth]{images/perception_pipeline.png}
 \caption{The modular ROS2 perception architecture. Raw RGB-D data is processed into structured semantic and geometric messages, accessible to the planner via specific service calls.}
+\Description{The modular ROS2 perception architecture}{The modular ROS2 perception architecture. Raw RGB-D data is processed into structured semantic and geometric messages, accessible to the planner via specific service calls.}
 \label{fig:perception_pipeline}
 \end{figure}
 
@@ -422,7 +415,7 @@ The architecture was first deployed in a simulation using \textbf{Gazebo Classic
 
 Subsequently, the system was transferred to real hardware using a \textbf{UR3e robot} with a Robotiq HandE gripper. By leveraging the official UR ROS2 Driver~\cite{ur_ros2_driver} and unified ROS2 interfaces, the transition from simulation to reality required no architectural changes, confirming the portability of the component-based design (Figure~\ref{fig:hardware-result-sim-vs-real}).
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\linewidth]{images/gazebo_setup.png}
     \caption{Simulation environment in Gazebo utilizing standard ROS2 interfaces for component validation.}
@@ -430,7 +423,7 @@ Subsequently, the system was transferred to real hardware using a \textbf{UR3e r
     \label{fig:simulation-gazebo-setup}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\linewidth]{images/sim_vs_real.png}
     \caption{Comparison between Real Hardware Setup (UR3e with Robotiq HandE gripper) and Simulation (Gazebo).}
